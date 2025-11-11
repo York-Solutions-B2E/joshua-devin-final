@@ -1,4 +1,5 @@
 services:
+#----------------------- Kafka--------------------
   kafka:
     image: confluentinc/confluent-local:latest
     container_name: kafka
@@ -31,14 +32,37 @@ services:
       interval: 10s
       timeout: 5s
       retries: 12
+#----------------------- postgres ----------------
   database:
     image: postgres:latest
+    container_name: postgres
     ports:
       - "5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB -h 127.0.0.1" ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+#--------------------- Services ------------------
+  app:
+    build:
+      context: ../tsgfeedbackapi
+      dockerfile: Dockerfile
+    container_name: spring-feedback-api
+    profiles: ["app"]   # <- only starts when you enable the "app" profile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    depends_on:
+      database:
+        condition: service_healthy
+# docker compose up -d : will run just kafka and postgres - use this for local dev
+# docker compose --profile app up -d : will spin up everything
 
 volumes:
   kafka-data:
