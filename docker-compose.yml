@@ -12,10 +12,11 @@ services:
       KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
       KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
 
-      # Listeners - host apps use localhost:9092
-      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://localhost:9092"
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT"
+      # Listeners - host apps use localhost:9092 and containers use kafka:29092
+      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:29092,PLAINTEXT_HOST://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
 
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: "1"
@@ -50,17 +51,38 @@ services:
 #--------------------- Services ------------------
   app:
     build:
-      context: ../tsgfeedbackapi
+      context: ../tsg-9.27-devinjosh-feedback-api
       dockerfile: Dockerfile
     container_name: spring-feedback-api
     profiles: ["app"]   # <- only starts when you enable the "app" profile
     environment:
+      SPRING_PROFILES_ACTIVE: docker
       SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/postgres
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
     depends_on:
       database:
         condition: service_healthy
+      kafka:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+
+  analytics-consumer:
+    build:
+      context: ../tsg-9.27-devinjosh-feedback-analytics-consumer
+      dockerfile: Dockerfile
+    container_name: feedback-analytics-consumer
+    profiles: ["app"]
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      KAFKA_CONSUMER_GROUP: feedback-analytics-consumer
+    depends_on:
+      kafka:
+        condition: service_healthy
+    restart: on-failure
 # docker compose up -d : will run just kafka and postgres - use this for local dev
 # docker compose --profile app up -d : will spin up everything
 

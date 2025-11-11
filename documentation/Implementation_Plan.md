@@ -10,6 +10,10 @@
 - **schema-contracts**  
   - Finalize API request/response DTOs, Postgres DDL, Kafka event JSON contract.
   - Document in `docs/contracts.md`.
+- **consumer-foundations (Dev B)**  
+  - Capture event contract, config outline, and package/test plan in `../tsg-9.27-devinjosh-feedback-analytics-consumer/docs/consumer_day1_notes.md`.
+  - Record pending decisions (structured logging format, retry/DLQ strategy) for resolution during Day 2 scaffolding.
+  - Ensure repo README lists required env vars (`KAFKA_BOOTSTRAP_SERVERS`, optional overrides) and references the Day 1 notes for onboarding.
 
 ## Day 2 – Backends Scaffolding
 - **api-scaffold (Dev A)**  
