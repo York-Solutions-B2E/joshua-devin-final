@@ -49,7 +49,7 @@ services:
       timeout: 5s
       retries: 20
 #--------------------- Services ------------------
-  app:
+  feedback-api:
     build:
       context: ../tsg-9.27-devinjosh-feedback-api
       dockerfile: Dockerfile
@@ -83,6 +83,15 @@ services:
       kafka:
         condition: service_healthy
     restart: on-failure
+
+  frontend-ui:
+    build:
+      context: ../tsg-9.27-devinjosh-frontend-feedback-ui
+      dockerfile: Dockerfile
+    container_name: frontend-ui
+    ports:
+      - "5173:80"
+    profiles: ["app"]
 # docker compose up -d : will run just kafka and postgres - use this for local dev
 # docker compose --profile app up -d : will spin up everything
 
