@@ -53,6 +53,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB -h 127.0.0.1" ]
       interval: 5s
@@ -63,7 +65,7 @@ services:
     build:
       context: ../tsg-9.27-devinjosh-feedback-api
       dockerfile: Dockerfile
-    container_name: spring-feedback-api
+    container_name: feedback-api
     profiles: ["app"]   # <- only starts when you enable the "app" profile
     environment:
       SPRING_PROFILES_ACTIVE: docker
@@ -107,3 +109,4 @@ services:
 
 volumes:
   kafka-data:
+  postgres_data:
