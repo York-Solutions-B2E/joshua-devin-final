@@ -2,6 +2,22 @@
 
 A full-stack feedback management system built with React, Spring Boot, Kafka, and PostgreSQL.
 
+
+## Table of Contents
+
+- [Architecture Overview](#architecture-overview)
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Service URLs](#service-urls)
+- [Running Tests](#running-tests)
+- [End-to-End Test Flow](#end-to-end-test-flow)
+- [Stopping Services](#stopping-services)
+- [Troubleshooting](#troubleshooting)
+- [Project Structure](#project-structure)
+- [Additional Resources](#additional-resources)
+
+---
+
 ## Architecture Overview
 
 - **Frontend UI**: React app (Vite) - Port `5173`
@@ -17,6 +33,35 @@ A full-stack feedback management system built with React, Spring Boot, Kafka, an
 - Java 21 (for local development)
 - Node.js 20+ (for local frontend development)
 
+**Clone All Repositories**
+
+This project consists of **four separate repositories** that must be cloned as **sibling directories**. The Docker Compose file uses relative paths, so the directory structure is critical.
+
+**Create a parent directory** for all repositories:
+
+```bash
+# Create a directory for the project
+mkdir Member_Feedback_Final
+cd Member_Feedback_Final
+```
+
+**Clone all four repositories** (replace with your actual GitHub URLs):
+
+```bash
+# Clone the Docker orchestration repository
+git clone <your-github-url>/joshua-devin-final.git
+
+# Clone the frontend repository
+git clone <your-github-url>/tsg-9.27-devinjosh-frontend-feedback-ui.git
+
+# Clone the API repository
+git clone <your-github-url>/tsg-9.27-devinjosh-feedback-api.git
+
+# Clone the analytics consumer repository
+git clone <your-github-url>/tsg-9.27-devinjosh-feedback-analytics-consumer.git
+```
+
+
 ## Quick Start
 
 ### Starting All Services
@@ -24,6 +69,8 @@ A full-stack feedback management system built with React, Spring Boot, Kafka, an
 From the root directory (`joshua-devin-final/`):
 
 ```bash
+cd joshua-devin-final
+
 # Start all services (infrastructure + applications)
 docker compose --profile app up -d
 
@@ -36,9 +83,7 @@ docker compose logs -f analytics-consumer
 docker compose logs -f frontend-ui
 ```
 
-**Note**: The `--profile app` flag is required because the application services are configured with `profiles: ["app"]` in docker-compose.yml.
-
-### Starting Only Infrastructure
+**Starting Only Infrastructure**
 
 For local development (running services outside Docker):
 
@@ -47,94 +92,102 @@ For local development (running services outside Docker):
 docker compose up -d
 ```
 
-## Service URLs & Testing
 
-### 1. Frontend UI
-- **URL**: `http://localhost:5173`
-- **Features**:
-  - Submit Feedback form (memberId, providerName, rating 1-5, optional comment)
-  - My Feedback page (filter by memberId)
-  - Client-side validation (rating 1-5, comment max 200 chars)
+**Note**: The `--profile app` flag is required because the application services are configured with `profiles: ["app"]` in docker-compose.yml.
 
-### 2. Swagger/OpenAPI Documentation
-- **Swagger UI**: `http://localhost:8082/swagger-ui.html`
-- **API Docs (JSON)**: `http://localhost:8082/api-docs`
+- If needed run `docker compose --profile app up -d --build` to rebuild the container.
 
-**Available Endpoints**:
+## Service URLs
+
+- **Frontend UI**: http://localhost:5173
+- **API Swagger**: http://localhost:8082/swagger-ui.html
+- **API Docs (JSON)**: http://localhost:8082/api-docs
+- **Kafka UI**: http://localhost:8000
+
+**API Endpoints**:
 - `POST /api/v1/feedback` - Submit new feedback
 - `GET /api/v1/feedback/{id}` - Get feedback by UUID
 - `GET /api/v1/feedback?memberId={id}` - Get feedback by member ID
 - `GET /api/v1/health` - Health check
 
-**Example POST Request**:
-```json
-{
-  "memberId": "m-123",
-  "providerName": "Dr. Smith",
-  "rating": 4,
-  "comment": "Great experience."
-}
-```
+## Running Tests
 
-### 3. Kafka Testing
+### Feedback API (`tsg-9.27-devinjosh-feedback-api`)
 
-**Kafka UI**:
-- **URL**: `http://localhost:8000`
-- View topics, messages, consumer groups, and broker information
-- Check topic: `feedback-submitted`
+**Test Files**:
+- `FeedbackServiceTest.java` - Unit tests for service layer (validation, business logic)
+- `FeedbackControllerTest.java` - Integration tests for REST endpoints
 
-**Verify Kafka Flow**:
-1. Submit feedback via frontend or Swagger
-2. Check Kafka UI at `http://localhost:8000`:
-   - Navigate to Topics → `feedback-submitted`
-   - View messages in the topic
-3. Check consumer logs:
+**Run Tests**:
 ```bash
-docker compose logs -f analytics-consumer
+cd tsg-9.27-devinjosh-feedback-api
+./mvnw clean test
 ```
 
-Expected log output:
+**Expected Output**:
 ```
-Received feedback event id=... memberId=... provider=... rating=... schemaVersion=1
+[INFO] Tests run: 18, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
 ```
 
-**Direct Kafka Commands** (optional):
+**Test Coverage**:
+-  Service validation (memberId, providerName, rating, comment)
+-  Happy path feedback creation
+-  GET by ID and memberId
+-  Error handling (not found, validation errors)
+-  Controller endpoints (POST, GET)
+-  JSON serialization/deserialization
+
+### Analytics Consumer (`tsg-9.27-devinjosh-feedback-analytics-consumer`)
+
+**Test Files**:
+- `FeedbackEventListenerTest.java` - Unit tests for Kafka event listener
+- `FeedbackAnalyticsConsumerApplicationTests.java` - Application context test
+
+**Run Tests**:
 ```bash
-# List topics
-docker exec -it kafka kafka-topics --bootstrap-server localhost:9092 --list
-
-# View messages in feedback-submitted topic
-docker exec -it kafka kafka-console-consumer \
-  --bootstrap-server localhost:9092 \
-  --topic feedback-submitted \
-  --from-beginning
+cd tsg-9.27-devinjosh-feedback-analytics-consumer
+./mvnw clean test
 ```
+
+**Expected Output**:
+```
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+```
+
+**Test Coverage**:
+- ✅ Event listener logging for valid payloads
+- ✅ Warning logs for comments exceeding length limit
+- ✅ JSON round-trip serialization/deserialization
+- ✅ Application context loading
+
+### Frontend UI (`tsg-9.27-devinjosh-frontend-feedback-ui`)
+
+**Test Files**: None currently implemented
+
+**Run Linting**:
+```bash
+cd tsg-9.27-devinjosh-frontend-feedback-ui
+npm run lint
+```
+
+**Note**: Frontend tests can be added using React Testing Library or Vitest if needed.
 
 ## End-to-End Test Flow
 
-1. **Start all services**:
-   ```bash
-   docker compose --profile app up -d
-   ```
-
-2. **Wait for services to be healthy**:
-   ```bash
-   docker compose --profile app ps
-   ```
-
-3. **Test Frontend**:
-   - Open `http://localhost:5173`
-   - Submit feedback with valid data
-   - View feedback by memberId
-
-4. **Test Swagger**:
-   - Open `http://localhost:8082/swagger-ui.html`
-   - Test all endpoints interactively
-
-5. **Verify Kafka**:
-   - Open `http://localhost:8000` (Kafka UI)
-   - Check `feedback-submitted` topic for messages
-   - Check consumer logs: `docker compose logs analytics-consumer`
+1. **Start all services**: `docker compose --profile app up -d`
+2. **Wait for services**: `docker compose --profile app ps` (verify all healthy)
+3. **Test Frontend**: Open http://localhost:5173, submit feedback, view by memberId
+4. **Test Swagger**: Open http://localhost:8082/swagger-ui.html, test endpoints interactively
+5. **Verify Kafka**: 
+   - Open http://localhost:8000 (Kafka UI), check `feedback-submitted` topic
+   - Check consumer logs: `docker compose --profile app logs analytics-consumer`
+   - Expected log: `Received feedback event id=... memberId=... provider=... rating=... schemaVersion=1`
 
 ## Stopping Services
 
@@ -153,8 +206,9 @@ docker compose --profile app down -v
 - **Kafka connection issues**: Verify Kafka health with `docker compose ps kafka`
 - **Database connection**: Ensure Postgres is healthy before API starts (configured with `depends_on`)
 
-## Project Structure
 
+## Project Structure
+**Current Repo**
 ```
 joshua-devin-final/
 ├── docker-compose.yml          # Orchestrates all services
@@ -165,7 +219,37 @@ joshua-devin-final/
 ../tsg-9.27-devinjosh-feedback-analytics-consumer/  # Kafka Consumer
 ../tsg-9.27-devinjosh-frontend-feedback-ui/  # React Frontend
 ```
-
+**Comprehensive Repo**
+```bash
+Member_Feedback_Final/
+│
+├── joshua-devin-final/ # Docker Orchestration Hub
+│ ├── docker-compose.yml # Main orchestration file
+│ ├── README.md # This file
+│ └── documentation/ # Project documentation
+│ ├── Spec_Provider_Feedback_Portal.md # Original specification
+│ └── Implementation_Plan.md # Development plan
+│
+├── tsg-9.27-devinjosh-frontend-feedback-ui/ # React Frontend
+│ ├── src/ # React source code
+│ ├── Dockerfile # Frontend container image
+│ ├── package.json # Node dependencies
+│ └── README.md # Frontend-specific docs
+│
+├── tsg-9.27-devinjosh-feedback-api/ # Spring Boot API
+│ ├── src/main/java/ # Java source code
+│ ├── src/main/resources/ # Configuration files
+│ ├── Dockerfile # API container image
+│ ├── pom.xml # Maven dependencies
+│ └── README.md # API-specific docs
+│
+└── tsg-9.27-devinjosh-feedback-analytics-consumer/ # Kafka Consumer
+├── src/main/java/ # Java source code
+├── src/main/resources/ # Configuration files
+├── Dockerfile # Consumer container image
+├── pom.xml # Maven dependencies
+└── README.md # Consumer-specific docs
+```
 ## Additional Resources
 
 - See individual service READMEs for local development instructions
