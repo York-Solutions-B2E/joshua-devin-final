@@ -79,6 +79,7 @@ docker compose logs -f feedback-api
 docker compose logs -f analytics-consumer
 docker compose logs -f frontend-ui
 ```
+**Note**: If you run into any conflicts when booting containers make sure to delete any existing containers sharing the same name/image.
 
 **Starting Only Infrastructure**
 
@@ -109,7 +110,7 @@ docker compose up -d
 
 ## Running Tests
 
-**If you run into any permission errors during testing please run this command:**
+**If you run into any permission errors during testing please run this command**:
 ```bash
 chmod +x mvnw
 ```
