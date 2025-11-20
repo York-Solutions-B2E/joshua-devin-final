@@ -181,6 +181,16 @@ npm run lint
 
 **Note**: Frontend tests can be added using React Testing Library or Vitest if needed.
 
+### Postgres
+
+**Test Database Save**
+
+To check if the feedback-api save to postgres run this command:
+```bash
+docker exec -e PGPASSWORD=postgres -it postgres \
+  psql -U postgres -d postgres -c "SELECT * FROM feedback;"
+```
+
 ## End-to-End Test Flow
 
 1. **Start all services**: `docker compose --profile app up -d`
@@ -188,7 +198,8 @@ npm run lint
 3. **Test Frontend**: Open http://localhost:5173, submit feedback, view by memberId
     - If you want to search by Feedback ID instead, you will have to find the UUID in Kafbat UI
 4. **Test Swagger**: Open http://localhost:8082/swagger-ui.html, test endpoints interactively
-5. **Verify Kafka**: 
+5. **Verify Postgres**: Use provided command to check rows saves to postgres
+6. **Verify Kafka**: 
    - Open http://localhost:8000 (Kafka UI), check `feedback-submitted` topic
    - Check consumer logs: `docker compose --profile app logs analytics-consumer`
    - Expected log: `Received feedback event id=... memberId=... provider=... rating=... schemaVersion=1`
