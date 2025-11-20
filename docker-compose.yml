@@ -63,7 +63,7 @@ services:
 #--------------------- Services ------------------
   feedback-api:
     build:
-      context: ../tsg-9.27-devinjosh-feedback-api
+      context: ./tsg-9.27-devinjosh-feedback-api
       dockerfile: Dockerfile
     container_name: feedback-api
     profiles: ["app"]   # <- only starts when you enable the "app" profile
@@ -90,7 +90,7 @@ services:
 
   analytics-consumer:
     build:
-      context: ../tsg-9.27-devinjosh-feedback-analytics-consumer
+      context: ./tsg-9.27-devinjosh-feedback-analytics-consumer
       dockerfile: Dockerfile
     container_name: feedback-analytics-consumer
     profiles: ["app"]
@@ -113,7 +113,7 @@ services:
 
   frontend-ui:
     build:
-      context: ../tsg-9.27-devinjosh-frontend-feedback-ui
+      context: ./tsg-9.27-devinjosh-frontend-feedback-ui
       dockerfile: Dockerfile
     container_name: frontend-ui
     ports:

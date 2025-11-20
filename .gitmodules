@@ -1,0 +1,9 @@
+[submodule "tsg-9.27-devinjosh-feedback-api"]
+	path = tsg-9.27-devinjosh-feedback-api
+	url = https://github.com/York-Solutions-B2E/tsg-9.27-devinjosh-feedback-api.git
+[submodule "tsg-9.27-devinjosh-frontend-feedback-ui"]
+	path = tsg-9.27-devinjosh-frontend-feedback-ui
+	url = https://github.com/York-Solutions-B2E/tsg-9.27-devinjosh-frontend-feedback-ui.git
+[submodule "tsg-9.27-devinjosh-feedback-analytics-consumer"]
+	path = tsg-9.27-devinjosh-feedback-analytics-consumer
+	url = https://github.com/York-Solutions-B2E/tsg-9.27-devinjosh-feedback-analytics-consumer.git
