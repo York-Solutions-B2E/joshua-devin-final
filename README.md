@@ -2,6 +2,8 @@
 
 A full-stack feedback management system built with React, Spring Boot, Kafka, and PostgreSQL.
 
+### This project contains Submodules
+
 
 ## Table of Contents
 
@@ -33,33 +35,28 @@ A full-stack feedback management system built with React, Spring Boot, Kafka, an
 - Java 21 (for local development)
 - Node.js 20+ (for local frontend development)
 
-**Clone All Repositories**
+**Clone this repository**
 
-This project consists of **four separate repositories** that must be cloned as **sibling directories**. The Docker Compose file uses relative paths, so the directory structure is critical.
+This project consists of **one repository** that contains **submodules**. When cloning this repo you must use a <u>recursive</u> command.
+```bash
+git clone --recursive https://github.com/York-Solutions-B2E/joshua-devin-final.git
+```
+This will set up the entire repo for you.
 
-**Create a parent directory** for all repositories:
+If you already cloned without --recursive run:
 
 ```bash
-# Create a directory for the project
-mkdir Member_Feedback_Final
-cd Member_Feedback_Final
+git submodule update --init --recursive
 ```
 
-**Clone all four repositories** (replace with your actual GitHub URLs):
+**Reference repositories** (don't clone these, the recursive command will do that for you):
 
-```bash
-# Clone the Docker orchestration repository
-git clone <your-github-url>/joshua-devin-final.git
+Feedback-ui: https://github.com/York-Solutions-B2E/tsg-9.27-devinjosh-frontend-feedback-ui.git
 
-# Clone the frontend repository
-git clone <your-github-url>/tsg-9.27-devinjosh-frontend-feedback-ui.git
+Feedback-api: https://github.com/York-Solutions-B2E/tsg-9.27-devinjosh-feedback-api.git
 
-# Clone the API repository
-git clone <your-github-url>/tsg-9.27-devinjosh-feedback-api.git
+Feedback-analytics-consumer: https://github.com/York-Solutions-B2E/tsg-9.27-devinjosh-feedback-analytics-consumer.git
 
-# Clone the analytics consumer repository
-git clone <your-github-url>/tsg-9.27-devinjosh-feedback-analytics-consumer.git
-```
 
 
 ## Quick Start
@@ -111,6 +108,11 @@ docker compose up -d
 - `GET /api/v1/health` - Health check
 
 ## Running Tests
+
+**If you run into any permission errors during testing please run this command:**
+```bash
+chmod +x mvnw
+```
 
 ### Feedback API (`tsg-9.27-devinjosh-feedback-api`)
 
@@ -183,6 +185,7 @@ npm run lint
 1. **Start all services**: `docker compose --profile app up -d`
 2. **Wait for services**: `docker compose --profile app ps` (verify all healthy)
 3. **Test Frontend**: Open http://localhost:5173, submit feedback, view by memberId
+    - If you want to search by Feedback ID instead, you will have to find the UUID in Kafbat UI
 4. **Test Swagger**: Open http://localhost:8082/swagger-ui.html, test endpoints interactively
 5. **Verify Kafka**: 
    - Open http://localhost:8000 (Kafka UI), check `feedback-submitted` topic
@@ -211,44 +214,29 @@ docker compose --profile app down -v
 **Current Repo**
 ```
 joshua-devin-final/
-├── docker-compose.yml          # Orchestrates all services
-├── documentation/              # Project documentation
-└── README.md                   # This file
-
-../tsg-9.27-devinjosh-feedback-api/          # Spring Boot API
-../tsg-9.27-devinjosh-feedback-analytics-consumer/  # Kafka Consumer
-../tsg-9.27-devinjosh-frontend-feedback-ui/  # React Frontend
-```
-**Comprehensive Repo**
-```bash
-Member_Feedback_Final/
+├── docker-compose.yml # Orchestrates all services
+├── documentation/ # Project documentation
+├── README.md # This file
 │
-├── joshua-devin-final/ # Docker Orchestration Hub
-│ ├── docker-compose.yml # Main orchestration file
-│ ├── README.md # This file
-│ └── documentation/ # Project documentation
-│ ├── Spec_Provider_Feedback_Portal.md # Original specification
-│ └── Implementation_Plan.md # Development plan
+├── tsg-9.27-devinjosh-feedback-api/ # Submodule: Spring Boot API
+│ ├── src/main/java/
+│ ├── src/main/resources/
+│ ├── Dockerfile
+│ ├── pom.xml
+│ └── README.md
 │
-├── tsg-9.27-devinjosh-frontend-feedback-ui/ # React Frontend
-│ ├── src/ # React source code
-│ ├── Dockerfile # Frontend container image
-│ ├── package.json # Node dependencies
-│ └── README.md # Frontend-specific docs
+├── tsg-9.27-devinjosh-feedback-analytics-consumer/ # Submodule: Kafka Consumer
+│ ├── src/main/java/
+│ ├── src/main/resources/
+│ ├── Dockerfile
+│ ├── pom.xml
+│ └── README.md
 │
-├── tsg-9.27-devinjosh-feedback-api/ # Spring Boot API
-│ ├── src/main/java/ # Java source code
-│ ├── src/main/resources/ # Configuration files
-│ ├── Dockerfile # API container image
-│ ├── pom.xml # Maven dependencies
-│ └── README.md # API-specific docs
-│
-└── tsg-9.27-devinjosh-feedback-analytics-consumer/ # Kafka Consumer
-├── src/main/java/ # Java source code
-├── src/main/resources/ # Configuration files
-├── Dockerfile # Consumer container image
-├── pom.xml # Maven dependencies
-└── README.md # Consumer-specific docs
+└── tsg-9.27-devinjosh-frontend-feedback-ui/ # Submodule: React Frontend
+├── src/
+├── Dockerfile
+├── package.json
+└── README.md
 ```
 ## Additional Resources
 
